@@ -10,6 +10,7 @@ This setup uses Vagrant with Docker to create multiple identical containers, eac
 
 - [Vagrant](https://www.vagrantup.com/downloads)
 - [Docker](https://docs.docker.com/get-docker/)
+- [Colima](https://github.com/abiosoft/colima) (Needs for this to run on my mac)
 - Git
 
 Ensure all prerequisites are installed and properly configured on your system before proceeding.
@@ -56,10 +57,6 @@ Ensure all prerequisites are installed and properly configured on your system be
 ## Security Note
 
 This setup uses password authentication for simplicity. In a production environment, consider implementing key-based authentication and additional security measures.
-
-## Contributing
-
-Contributions to improve the setup or documentation are welcome. Please submit a pull request or open an issue for any enhancements.
 
 ## License
 
