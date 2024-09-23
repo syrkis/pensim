@@ -19,7 +19,7 @@ Ensure all prerequisites are installed and properly configured on your system be
 1. Clone this repository:
 
    ```
-   git clone https://github.com/your-username/pensim.git
+   git clone https://github.com/syrkis/pensim.git
    cd pensim
    ```
 
@@ -30,10 +30,6 @@ Ensure all prerequisites are installed and properly configured on your system be
    ```
 
 3. Connect to a specific environment (replace X with a number from 1 to 10):
-   ```
-   vagrant ssh studentX
-   ```
-   or
    ```
    ssh -p 222X vagrant@localhost
    ```
@@ -50,6 +46,7 @@ Ensure all prerequisites are installed and properly configured on your system be
 - Students can install additional tools and modify their environments as needed.
 - Each environment is isolated, allowing for independent work and experimentation.
 - Use `vagrant halt` to stop all environments, and `vagrant destroy -f` to remove them completely.
+- Also remove the docker containers with `docker rm -f $(docker ps -a -q)` and the docker images with `docker rmi $(docker images -q)`.
 
 ## Customization
 
@@ -67,8 +64,3 @@ Contributions to improve the setup or documentation are welcome. Please submit a
 ## License
 
 [MIT License](LICENSE)
-
-## Disclaimer
-
-This t
-# pensim

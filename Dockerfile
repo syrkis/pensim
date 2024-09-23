@@ -14,6 +14,9 @@ RUN mkdir -p /home/vagrant/.ssh
 RUN chmod 700 /home/vagrant/.ssh
 RUN chown -R vagrant:vagrant /home/vagrant/.ssh
 
+# Enable password authentication
+RUN sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
 EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]
