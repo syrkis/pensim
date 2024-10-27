@@ -1,3 +1,8 @@
+NUM_VMS = 3
+BASE_PORT = 8080
+HOST_IP = "192.168.1.100"  # Replace with your server's IP
+
+
 Vagrant.configure("2") do |config|
   (1..NUM_VMS).each do |i|
     config.vm.define "student_#{i}" do |node|
