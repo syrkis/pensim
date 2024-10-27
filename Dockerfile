@@ -1,5 +1,9 @@
 FROM ubuntu:20.04
 
+# Set noninteractive installation
+
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /home
 
 # Copy the secret notes app
