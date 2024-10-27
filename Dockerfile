@@ -1,15 +1,8 @@
 FROM ubuntu:20.04
 
-# Set noninteractive installation
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /home
-
-# Copy the secret notes app
-COPY MySecretNotes.zip /home/
-RUN apt-get update && apt-get install -y unzip
-RUN unzip MySecretNotes.zip
 
 # Install basic utilities and SSH server
 RUN apt-get update && apt-get install -y \
@@ -24,7 +17,8 @@ RUN apt-get update && apt-get install -y \
 
 # Setup SSH
 RUN mkdir /var/run/sshd
-RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # Create student user
 RUN useradd -m -s /bin/bash student && \
@@ -34,5 +28,8 @@ RUN useradd -m -s /bin/bash student && \
 # Ensure the student directory persists
 VOLUME ["/home/student"]
 
+# Expose SSH port
+EXPOSE 22
+
 # Start SSH server
-CMD ["/usr/sbin/sshd", "-D"]
+ENTRYPOINT service ssh start && tail -f /dev/null

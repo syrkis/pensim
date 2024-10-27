@@ -1,21 +1,20 @@
 NUM_VMS = 3
 BASE_PORT = 8080
-HOST_IP = "192.168.1.100"  # Replace with your server's IP
+SSH_BASE_PORT = 2222  # Base port for SSH
 
 Vagrant.configure("2") do |config|
   (1..NUM_VMS).each do |i|
     config.vm.define "student_#{i}" do |node|
       node.vm.provider "docker" do |docker|
         docker.name = "student_#{i}"
-        
-        # Specify the build directory where Dockerfile is located
-        docker.build_dir = "."  # Assuming Dockerfile is in the same directory
+        docker.build_dir = "."
+        docker.has_ssh = true
         
         # Additional volumes for specific purposes
         docker.volumes = [
           "student_#{i}_home:/home/student",
-          "student_#{i}_opt:/opt",        # For additional software
-          "student_#{i}_var:/var"         # For logs and variable data
+          "student_#{i}_opt:/opt",
+          "student_#{i}_var:/var"
         ]
 
         # Resource limits
@@ -28,6 +27,9 @@ Vagrant.configure("2") do |config|
           "--security-opt=no-new-privileges:true",
           "--ulimit", "nofile=65535:65535"
         ]
+
+        # Expose SSH port
+        docker.ports = ["#{SSH_BASE_PORT + i - 1}:22"]
       end
     end
   end
