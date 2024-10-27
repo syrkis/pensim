@@ -1,32 +1,27 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-NUM_STUDENTS = 2
-BASE_SSH_PORT = 2222
-
 Vagrant.configure("2") do |config|
-  (1..NUM_STUDENTS).each do |i|
-    config.vm.define "student#{i}" do |node|
-      node.vm.provider "docker" do |d|
-        d.build_dir = "."
-        d.name = "vagrant_pensim_student#{i}"
-        d.has_ssh = true
-        d.remains_running = true
-        d.ports = ["127.0.0.1:#{BASE_SSH_PORT + i}:22"]
+  (1..NUM_VMS).each do |i|
+    config.vm.define "student_#{i}" do |node|
+      node.vm.provider "docker" do |docker|
+        docker.name = "student_#{i}"
+        
+        # Additional volumes for specific purposes
+        docker.volumes = [
+          "student_#{i}_home:/home/student",
+          "student_#{i}_opt:/opt",        # For additional software
+          "student_#{i}_var:/var"         # For logs and variable data
+        ]
+
+        # Resource limits
+        docker.create_args = [
+          "--hostname=student#{i}",
+          "--memory=2g",
+          "--memory-swap=4g",
+          "--cpus=1",
+          "--restart=unless-stopped",
+          "--security-opt=no-new-privileges:true",
+          "--ulimit", "nofile=65535:65535"
+        ]
       end
-
-      # Configure SSH to use password authentication
-      node.ssh.username = "vagrant"
-      node.ssh.password = "vagrant"
-      node.ssh.insert_key = false
-
-      # Provision the container
-      node.vm.provision "shell", inline: <<-SHELL
-        echo "This is student#{i}'s machine" > /home/vagrant/student_info.txt
-        echo "Student #{i} can login with:"
-        echo "ssh -p #{BASE_SSH_PORT + i} vagrant@localhost"
-        echo "Password: vagrant"
-      SHELL
     end
   end
 end

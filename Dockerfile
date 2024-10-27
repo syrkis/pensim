@@ -1,22 +1,50 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
-RUN apt-get update && apt-get install -y openssh-server sudo python3 python3-pip sqlite3 git
+WORKDIR /home
+
+# Copy the secret notes app
+COPY MySecretNotes.zip /home/
+RUN apt-get update && apt-get install -y unzip
+RUN unzip MySecretNotes.zip
+
+# Install basic utilities and SSH server
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    sudo \
+    vim \
+    curl \
+    wget \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Setup SSH
 RUN mkdir /var/run/sshd
-RUN echo 'root:vagrant' | chpasswd
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+FROM ubuntu:20.04
 
-RUN useradd -m -s /bin/bash vagrant
-RUN echo "vagrant:vagrant" | chpasswd
-RUN echo "vagrant ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vagrant
+# Install basic utilities and SSH server
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    sudo \
+    vim \
+    curl \
+    wget \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /home/vagrant/.ssh
-RUN chmod 700 /home/vagrant/.ssh
-RUN chown -R vagrant:vagrant /home/vagrant/.ssh
+# Setup SSH
+RUN mkdir /var/run/sshd
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
-# Enable password authentication
-RUN sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+# Create student user
+RUN useradd -m -s /bin/bash student && \
+    echo "student:student" | chpasswd && \
+    adduser student sudo
 
-EXPOSE 22
+# Ensure the student directory persists
+VOLUME ["/home/student"]
 
+# Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]
