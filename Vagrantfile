@@ -1,15 +1,19 @@
 NUM_VMS = 3
-SSH_BASE_PORT = 2200  # Starting from 2200
+SSH_BASE_PORT = 2200
 
 Vagrant.configure("2") do |config|
+  config.ssh.username = "student"
+  config.ssh.password = "student"
+  config.ssh.insert_key = false
+
   (1..NUM_VMS).each do |i|
     config.vm.define "student_#{i}" do |node|
       node.vm.provider "docker" do |docker|
         docker.name = "student_#{i}"
         docker.build_dir = "."
         
-        # Expose SSH port properly
-        docker.ports = ["#{SSH_BASE_PORT + i - 1}:22"]
+        # Map SSH port
+        docker.ports = ["127.0.0.1:#{SSH_BASE_PORT + i - 1}:22"]
         
         docker.volumes = [
           "student_#{i}_home:/home/student",
@@ -27,7 +31,6 @@ Vagrant.configure("2") do |config|
           "--ulimit", "nofile=65535:65535"
         ]
 
-        # Ensure SSH is running
         docker.remains_running = true
         docker.has_ssh = true
       end

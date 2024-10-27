@@ -1,7 +1,5 @@
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 WORKDIR /home
 
 # Install basic utilities and SSH server
@@ -20,7 +18,7 @@ RUN mkdir /var/run/sshd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-# Create student user
+# Create student user with sudo privileges
 RUN useradd -m -s /bin/bash student && \
     echo "student:student" | chpasswd && \
     adduser student sudo
@@ -32,4 +30,4 @@ VOLUME ["/home/student"]
 EXPOSE 22
 
 # Start SSH server
-ENTRYPOINT service ssh start && tail -f /dev/null
+ENTRYPOINT ["/usr/sbin/sshd", "-D"]
