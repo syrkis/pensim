@@ -2,12 +2,14 @@ NUM_VMS = 3
 BASE_PORT = 8080
 HOST_IP = "192.168.1.100"  # Replace with your server's IP
 
-
 Vagrant.configure("2") do |config|
   (1..NUM_VMS).each do |i|
     config.vm.define "student_#{i}" do |node|
       node.vm.provider "docker" do |docker|
         docker.name = "student_#{i}"
+        
+        # Specify the build directory where Dockerfile is located
+        docker.build_dir = "."  # Assuming Dockerfile is in the same directory
         
         # Additional volumes for specific purposes
         docker.volumes = [
