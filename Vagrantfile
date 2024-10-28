@@ -1,14 +1,15 @@
 # Vagrantfile
-NUM_VMS = 3
-SSH_BASE_PORT = 3333
-WEB_BASE_PORT = 8000  # Each student gets ports 8000-8009, 8010-8019, 8020-8029
+NUM_VMS = 100
 
 Vagrant.configure("2") do |config|
+  # Create the pensim network if it doesn't exist
+  system('docker network create --subnet=10.0.1.0/24 pensim || true')
+
   config.ssh.username = "student"
   config.ssh.password = "student"
   config.ssh.insert_key = false
 
-  # Disable all vagrant syncing/mounting
+  # Disable default synced folder
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.allow_fstab_modification = false
   config.vm.allow_hosts_modification = false
@@ -17,17 +18,13 @@ Vagrant.configure("2") do |config|
     config.vm.define "student_#{i}" do |node|
       node.vm.provider "docker" do |docker|
         docker.name = "student_#{i}"
-        docker.build_dir = "."
-
-        # Map SSH port and a range of web ports for each student
-        docker.ports = [
-          "127.0.0.1:#{SSH_BASE_PORT + i - 1}:22",
-          # Give each student 10 ports for web services
-          "127.0.0.1:#{WEB_BASE_PORT + (i-1)*10}-#{WEB_BASE_PORT + (i-1)*10 + 9}:#{WEB_BASE_PORT + (i-1)*10}-#{WEB_BASE_PORT + (i-1)*10 + 9}"
-        ]
-
+        docker.build_dir = "."  # Directory containing Dockerfile
         docker.volumes = ["student_#{i}_home:/home/student"]
-        docker.create_args = ["--hostname=student#{i}"]
+        docker.create_args = [
+          "--hostname=student#{i}",
+          "--network=pensim",
+          "--ip=10.0.1.#{i+10}"  # Will give IPs from 10.0.1.11 to 10.0.1.110
+        ]
       end
     end
   end
