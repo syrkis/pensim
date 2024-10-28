@@ -1,5 +1,15 @@
 Sim: Penetration Testing Simulation Environments
 
+# server
+
+- creating a docker network `docker network create --subnet=172.20.0.0/16 pensim`
+
+# client
+
+- ssh -D 1080 pensim@130.226.143.130 # SETUP SSH TUNNEL
+- nmap -sT -p- -Pn -v --open -sV --proxies socks4://127.0.0.1:1080 10.0.1.11 # NMAP A CONTAINER
+- ssh -o ProxyCommand="nc -x 127.0.0.1:1080 %h %p" student@10.0.1.11 # LOGIN
+
 This repository contains a Vagrant configuration for creating multiple isolated penetration testing environments, ideal for educational purposes or multi-user testing scenarios.
 
 ## Overview
